@@ -9,15 +9,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      -  name: Build Image
-         run: |
+      - uses: actions/checkout@v3
+
+      - name: Build Image
+        run: |
           docker build -t $IMAGE_NAME $IMAGE_NAME
      
-      -  name: Log In to Registry
-         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Log In to Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      -  name: Push Image
-         run: |
+      - name: Push Image
+        run: |
            IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
            # Change all uppercase to lowercase
            IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
