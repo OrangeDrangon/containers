@@ -1,0 +1,30 @@
+name: beanstalkd
+on:
+  workflow_dispatch:
+  
+env:
+  IMAGE_NAME: beanstalkd
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      -  name: Build Image
+         run: |
+          docker build -t $IMAGE_NAME .
+     
+      -  name: Log In to Registry
+         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      -  name: Push Image
+         run: |
+           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+           # Change all uppercase to lowercase
+           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+           VERSION=${{ github.sha }}
+           echo IMAGE_ID=$IMAGE_ID
+           echo VERSION=$VERSION
+           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+           docker tag $IMAGE_NAME $IMAGE_ID:latest
+           docker push $IMAGE_ID:$VERSION
+           docker push $IMAGE_ID:latest
